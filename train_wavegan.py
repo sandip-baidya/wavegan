@@ -52,9 +52,9 @@ def parse_arguments():
 if __name__ == '__main__':
     args = parse_arguments()
 
-    init_console_logger(LOGGER, args['verbose'])
+#     init_console_logger(LOGGER, args['verbose'])
 
-    LOGGER.info('Initialized logger.')
+#     LOGGER.info('Initialized logger.')
 
     batch_size = args['batch_size']
     latent_dim = args['latent_dim']
