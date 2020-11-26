@@ -9,12 +9,12 @@ import pickle as pk
 from sample import get_all_audio_filepaths, create_data_split
 from wavegan import WaveGANDiscriminator, WaveGANGenerator
 from wgan import train_wgan
-from log import init_console_logger
+# from log import init_console_logger
 from utils import save_samples
 
 
-LOGGER = logging.getLogger('wavegan')
-LOGGER.setLevel(logging.DEBUG)
+# LOGGER = logging.getLogger('wavegan')
+# LOGGER.setLevel(logging.DEBUG)
 
 
 def parse_arguments():
@@ -68,26 +68,26 @@ if __name__ == '__main__':
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
 
-    LOGGER.info('Saving configurations...')
+    print('Saving configurations...')
     config_path = os.path.join(model_dir, 'config.json')
     with open(config_path, 'w') as f:
         json.dump(args, f)
 
     # Try on some training data
-    LOGGER.info('Loading audio data...')
+    print('Loading audio data...')
     audio_filepaths = get_all_audio_filepaths(args['audio_dir'])
     train_gen, valid_data, test_data \
         = create_data_split(audio_filepaths, args['valid_ratio'], args['test_ratio'],
                             batch_size, batch_size, batch_size)
 
-    LOGGER.info('Creating models...')
+    print('Creating models...')
     model_gen = WaveGANGenerator(model_size=model_size, ngpus=ngpus, latent_dim=latent_dim,
                                  post_proc_filt_len=args['post_proc_filt_len'], upsample=True)
     model_dis = WaveGANDiscriminator(model_size=model_size, ngpus=ngpus,
                                      alpha=args['alpha'], shift_factor=args['shift_factor'],
                                      batch_shuffle=args['batch_shuffle'])
 
-    LOGGER.info('Starting training...')
+    print('Starting training...')
     model_gen, model_dis, history, final_discr_metrics, samples = train_wgan(
         model_gen=model_gen,
         model_dis=model_dis,
@@ -108,12 +108,12 @@ if __name__ == '__main__':
         epochs_per_sample=args['epochs_per_sample'],
         sample_size=args['sample_size'])
 
-    LOGGER.info('Finished training.')
+    print('Finished training.')
 
-    LOGGER.info('Final discriminator loss on validation and test:')
-    LOGGER.info(pprint.pformat(final_discr_metrics))
+    print('Final discriminator loss on validation and test:')
+#     LOGGER.info(pprint.pformat(final_discr_metrics))
 
-    LOGGER.info('Saving models...')
+    print('Saving models...')
     model_gen_output_path = os.path.join(model_dir, "model_gen.pkl")
     model_dis_output_path = os.path.join(model_dir, "model_dis.pkl")
     torch.save(model_gen.state_dict(), model_gen_output_path,
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     torch.save(model_dis.state_dict(), model_dis_output_path,
                pickle_protocol=pk.HIGHEST_PROTOCOL)
 
-    LOGGER.info('Saving metrics...')
+    print('Saving metrics...')
     history_output_path = os.path.join(model_dir, "history.pkl")
     final_discr_metrics_output_path = os.path.join(model_dir, "final_discr_metrics.pkl")
     with open(history_output_path, 'wb') as f:
@@ -129,4 +129,4 @@ if __name__ == '__main__':
     with open(final_discr_metrics_output_path, 'wb') as f:
         pk.dump(final_discr_metrics, f)
 
-    LOGGER.info('Done!')
+    print('Done!')
